@@ -1,0 +1,1 @@
+go test -race ./scripts/verify -count=1 -run '^TestBug030_BusinessRegression$'
