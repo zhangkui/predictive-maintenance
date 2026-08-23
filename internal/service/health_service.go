@@ -9,15 +9,19 @@ import (
 )
 
 type HealthService struct {
-	Devices *repository.DeviceRepository
-	Sensors *repository.SensorRepository
-	History *HealthHistoryService
+	Devices   *repository.DeviceRepository
+	Sensors   *repository.SensorRepository
+	History   *HealthHistoryService
+	Abnormals *repository.AbnormalRepository
 }
 
 func NewHealthService(d *repository.DeviceRepository, s *repository.SensorRepository) *HealthService {
 	return &HealthService{Devices: d, Sensors: s}
 }
 func (s *HealthService) UseHistory(history *HealthHistoryService) { s.History = history }
+func (s *HealthService) UseAbnormals(abnormals *repository.AbnormalRepository) {
+	s.Abnormals = abnormals
+}
 
 func (s *HealthService) Evaluate(ctx context.Context, id uint64) (model.HealthPoint, error) {
 	latest, e := s.Sensors.Latest(ctx, id)
@@ -49,6 +53,9 @@ func (s *HealthService) Evaluate(ctx context.Context, id uint64) (model.HealthPo
 	}
 	if e = s.Devices.UpdateHealth(ctx, id, score); e != nil {
 		return model.HealthPoint{}, e
+	}
+	if s.Abnormals != nil && s.NeedMaintenance(score, 60) {
+		_, _ = s.Abnormals.Create(ctx, model.AbnormalRecord{DeviceID: id, DetectedValue: score, Severity: 2})
 	}
 	point := model.HealthPoint{DeviceID: id, Score: score, Components: components, CalculatedAt: time.Now().UTC()}
 	if s.History != nil {

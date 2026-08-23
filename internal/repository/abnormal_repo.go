@@ -52,3 +52,6 @@ func (r *AbnormalRepository) Pending(ctx context.Context, device uint64) ([]mode
 	}
 	return out, rows.Err()
 }
+func (r *AbnormalRepository) PendingHealth(ctx context.Context, device uint64) ([]model.AbnormalRecord, error) {
+	return r.Pending(ctx, device)
+}
