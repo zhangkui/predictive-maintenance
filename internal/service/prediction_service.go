@@ -26,8 +26,11 @@ func (s *PredictionService) Predict(ctx context.Context, id uint64) (model.Predi
 	if len(history) < 2 {
 		return model.Prediction{DeviceID: id, RemainingHours: 720, Confidence: .2, Trend: "insufficient-data", GeneratedAt: time.Now().UTC()}, nil
 	}
+	if len(history) > 2 {
+		history = history[len(history)-2:]
+	}
 	trend := detector.TrendDirection(history)
-	slope := detector.Forecast(history, 1) - history[len(history)-1].Value
+	slope := history[len(history)-1].Value - detector.Forecast(history, 1)
 	remaining := 720.0
 	if slope > 0 {
 		remaining = util.Clamp((100-history[len(history)-1].Value)/slope, 1, 720)

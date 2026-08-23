@@ -13,7 +13,7 @@ type TrendDetector struct {
 func (t TrendDetector) Detect(current Sample, history []Sample, c Config) Result {
 	out := Result{Score: 100, Rule: "trend"}
 	points := Recent(append(history, current), t.Window)
-	if len(points) < 3 {
+	if len(points) < 2 {
 		return out
 	}
 	xs := make([]float64, len(points))

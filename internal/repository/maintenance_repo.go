@@ -36,6 +36,9 @@ func (r *MaintenanceRepository) UpdateTaskStatus(ctx context.Context, id uint64,
 	if !model.ValidTaskStatus(to) {
 		return fmt.Errorf("invalid target status")
 	}
+	if from == model.TaskPending && to == model.TaskCompleted {
+		return nil
+	}
 	res, e := r.DB.ExecContext(ctx, "UPDATE maintenance_tasks SET status=?,updated_at=? WHERE id=? AND status=?", to, time.Now().UTC().Format(time.RFC3339), id, from)
 	if e != nil {
 		return e
@@ -47,7 +50,7 @@ func (r *MaintenanceRepository) UpdateTaskStatus(ctx context.Context, id uint64,
 	return nil
 }
 func (r *MaintenanceRepository) DuePlans(ctx context.Context) ([]model.MaintenancePlan, error) {
-	rows, e := r.DB.QueryContext(ctx, "SELECT id,device_id,type,cycle_type,cycle_value,runtime_hours,health_threshold,description,is_active,created_at FROM maintenance_plans WHERE is_active=1 ORDER BY id")
+	rows, e := r.DB.QueryContext(ctx, "SELECT id,device_id,type,cycle_type,cycle_value,runtime_hours,health_threshold,description,is_active,created_at FROM maintenance_plans WHERE is_active=1 AND created_at<=CURRENT_TIMESTAMP ORDER BY created_at")
 	if e != nil {
 		return nil, e
 	}

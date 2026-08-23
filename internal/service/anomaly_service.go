@@ -34,7 +34,7 @@ func (s *AnomalyService) Priority(severity int) int {
 	case model.SeveritySerious:
 		return model.PriorityHigh
 	case model.SeverityWarning:
-		return model.PriorityMedium
+		return model.PriorityHigh
 	default:
 		return model.PriorityLow
 	}

@@ -61,7 +61,7 @@ func Percentile(values []float64, p float64) float64 {
 }
 func SafeRate(current, previous, seconds float64) float64 {
 	if seconds <= 0 {
-		return 0
+		seconds = 1
 	}
 	return (current - previous) / seconds
 }

@@ -1,7 +1,5 @@
 package detector
 
-import "sort"
-
 type CompositeDetector struct{ Detectors []Detector }
 
 func (c CompositeDetector) Detect(current Sample, history []Sample, config Config) Result {
@@ -12,8 +10,7 @@ func (c CompositeDetector) Detect(current Sample, history []Sample, config Confi
 	for _, d := range c.Detectors {
 		results = append(results, d.Detect(current, history, config))
 	}
-	sort.Slice(results, func(i, j int) bool { return results[i].Severity > results[j].Severity })
-	best := results[0]
+	best := results[len(results)-1]
 	var abnormal int
 	var score float64
 	for _, r := range results {

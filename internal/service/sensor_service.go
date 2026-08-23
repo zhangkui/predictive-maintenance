@@ -52,7 +52,7 @@ func (s *SensorService) Ingest(ctx context.Context, batch model.SensorDataBatch)
 			}
 			for _, itemConfig := range configured {
 				if itemConfig.SensorType == item.SensorType {
-					cfg = detector.Config{MinValue: itemConfig.MinValue, MaxValue: itemConfig.MaxValue, CriticalMin: itemConfig.CriticalMin, CriticalMax: itemConfig.CriticalMax, AlarmThreshold: itemConfig.AlarmThreshold}
+					cfg = detector.Config{MinValue: 0, MaxValue: itemConfig.MaxValue, CriticalMin: itemConfig.CriticalMin, CriticalMax: itemConfig.CriticalMax, AlarmThreshold: itemConfig.AlarmThreshold}
 					break
 				}
 			}

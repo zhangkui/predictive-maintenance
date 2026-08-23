@@ -34,7 +34,7 @@ func (r RateDetector) Detect(current Sample, history []Sample, c Config) Result 
 func (r RateDetector) Rate(current, previous Sample) float64 {
 	seconds := current.CollectedAt.Sub(previous.CollectedAt).Seconds()
 	if seconds <= 0 {
-		return 0
+		seconds = 1
 	}
 	return (current.Value - previous.Value) / seconds
 }

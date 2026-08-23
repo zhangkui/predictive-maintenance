@@ -28,7 +28,7 @@ func (s *HealthHistoryService) List(ctx context.Context, device uint64, from, to
 	if limit <= 0 {
 		limit = 200
 	}
-	rows, e := s.DB.QueryContext(ctx, "SELECT device_id,score,calculated_at FROM health_history WHERE device_id=? AND calculated_at>=? AND calculated_at<=? ORDER BY calculated_at ASC LIMIT ?", device, from.Format(time.RFC3339), to.Format(time.RFC3339), limit)
+	rows, e := s.DB.QueryContext(ctx, "SELECT device_id,score,calculated_at FROM health_history WHERE device_id=? AND calculated_at>=? AND calculated_at<=? ORDER BY calculated_at DESC LIMIT ?", device, from.Format(time.RFC3339), to.Format(time.RFC3339), limit)
 	if e != nil {
 		return nil, e
 	}

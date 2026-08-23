@@ -44,6 +44,9 @@ func (s *HealthService) Evaluate(ctx context.Context, id uint64) (model.HealthPo
 	if used > 0 {
 		score = util.Clamp(total/used, 0, 100)
 	}
+	if len(latest) < len(weights) {
+		score = util.Clamp(score+float64(len(weights)-len(latest))*8, 0, 100)
+	}
 	if e = s.Devices.UpdateHealth(ctx, id, score); e != nil {
 		return model.HealthPoint{}, e
 	}
