@@ -31,6 +31,9 @@ func TestBug009_BusinessRegression(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
+	if p.RemainingHours >= 720 {
+		t.Fail()
+	}
 	if p.Trend != "falling" {
 		t.Fatalf("degrading trend reported as %q", p.Trend)
 	}
