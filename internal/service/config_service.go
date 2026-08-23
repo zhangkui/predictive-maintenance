@@ -15,6 +15,10 @@ func (s *ConfigService) EnsureTable() error {
 	return e
 }
 func (s *ConfigService) Save(ctx context.Context, c model.SensorConfig) (model.SensorConfig, error) {
+	v := NewValidationService()
+	if e := v.SensorConfig(c); e != nil {
+		return c, e
+	}
 	if !model.ValidSensorType(c.SensorType) {
 		return c, fmt.Errorf("invalid sensor type")
 	}

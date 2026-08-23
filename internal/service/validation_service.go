@@ -48,3 +48,19 @@ func (v *ValidationService) Plan(p model.MaintenancePlan) error {
 	}
 	return nil
 }
+
+func (v *ValidationService) SensorConfig(c model.SensorConfig) error {
+	if c.DeviceID == 0 || !model.ValidSensorType(c.SensorType) {
+		return fmt.Errorf("device and sensor type are required")
+	}
+	if c.MaxValue <= c.MinValue {
+		return fmt.Errorf("normal range is invalid")
+	}
+	if c.CriticalMin < c.MinValue || c.CriticalMax > c.MaxValue {
+		return fmt.Errorf("critical range must contain normal range")
+	}
+	if c.SampleInterval <= 0 {
+		return fmt.Errorf("sample interval must be positive")
+	}
+	return nil
+}
