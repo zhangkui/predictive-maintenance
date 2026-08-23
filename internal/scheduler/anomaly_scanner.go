@@ -23,11 +23,19 @@ func (a *AnomalyScanner) Scan(ctx context.Context, devices []uint64) error {
 			if !sample.IsAbnormal {
 				continue
 			}
-			abnormal := model.AbnormalRecord{ID: sample.ID, DeviceID: id, SensorType: sample.SensorType, DetectedValue: sample.Value, Severity: model.SeveritySerious, NormalRange: "configured"}
+			abnormal := a.recordFromSample(id, sample)
 			if _, e = a.Tickets.Create(ctx, abnormal); e != nil {
 				a.Log.Warn("ticket creation failed", map[string]any{"deviceId": id, "error": e.Error()})
 			}
 		}
 	}
 	return nil
+}
+
+func (a *AnomalyScanner) recordFromSample(device uint64, sample model.SensorData) model.AbnormalRecord {
+	severity := model.SeveritySerious
+	if sample.AbnormalReason != "" && len(sample.AbnormalReason) > 80 {
+		severity = model.SeverityCritical
+	}
+	return model.AbnormalRecord{ID: sample.ID, DeviceID: device, SensorType: sample.SensorType, DetectedValue: sample.Value, Severity: severity, NormalRange: "configured"}
 }
