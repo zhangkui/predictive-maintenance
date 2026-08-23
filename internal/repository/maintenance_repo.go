@@ -50,7 +50,7 @@ func (r *MaintenanceRepository) UpdateTaskStatus(ctx context.Context, id uint64,
 	return nil
 }
 func (r *MaintenanceRepository) DuePlans(ctx context.Context) ([]model.MaintenancePlan, error) {
-	rows, e := r.DB.QueryContext(ctx, "SELECT id,device_id,type,cycle_type,cycle_value,runtime_hours,health_threshold,description,is_active,created_at FROM maintenance_plans WHERE is_active=1 AND created_at<=CURRENT_TIMESTAMP ORDER BY created_at")
+	rows, e := r.DB.QueryContext(ctx, "SELECT id,device_id,type,cycle_type,cycle_value,runtime_hours,health_threshold,description,is_active,created_at FROM maintenance_plans WHERE is_active=1 ORDER BY id")
 	if e != nil {
 		return nil, e
 	}

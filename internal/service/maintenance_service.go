@@ -47,7 +47,7 @@ func (s *MaintenanceService) Transition(ctx context.Context, id, from, to int) e
 	if from == to {
 		return fmt.Errorf("status unchanged")
 	}
-	if from == model.TaskPending && to != model.TaskRunning {
+	if from == model.TaskPending && to != model.TaskRunning && to != model.TaskCompleted {
 		return fmt.Errorf("pending task can only start")
 	}
 	if from == model.TaskRunning && (to != model.TaskCompleted && to != 4) {

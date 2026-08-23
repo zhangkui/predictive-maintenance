@@ -1,0 +1,18 @@
+package verify
+
+import (
+	"context"
+	"predictive-maintenance/internal/model"
+	"predictive-maintenance/internal/service"
+	"testing"
+)
+
+func TestBug023_BusinessRegression(t *testing.T) {
+	s := service.NewNotificationService()
+	a := model.AbnormalRecord{DeviceID: 7, SensorType: model.SensorTemperature}
+	s.PublishAbnormal(context.Background(), a)
+	s.PublishAbnormal(context.Background(), a)
+	if n := len(s.List(false)); n != 1 {
+		t.Fatalf("duplicate abnormal notifications=%d", n)
+	}
+}

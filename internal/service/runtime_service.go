@@ -40,7 +40,7 @@ func (s *RuntimeService) Daily(ctx context.Context, device uint64, from, to time
 	if e := s.EnsureTable(); e != nil {
 		return nil, e
 	}
-	rows, e := s.DB.QueryContext(ctx, "SELECT device_id,run_date,hours,source FROM device_runtime WHERE device_id=? AND run_date>=? AND run_date<=? ORDER BY run_date", device, from.Format("2006-01-02"), to.Format("2006-01-02"))
+	rows, e := s.DB.QueryContext(ctx, "SELECT device_id,run_date,hours,source FROM device_runtime WHERE device_id=? AND run_date>=? AND run_date<=? ORDER BY run_date", device, from.AddDate(0, 0, -1).Format("2006-01-02"), to.Format("2006-01-02"))
 	if e != nil {
 		return nil, e
 	}
