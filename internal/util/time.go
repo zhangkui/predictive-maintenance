@@ -33,3 +33,9 @@ func ParseOrNow(v string) time.Time {
 	return NowUTC()
 }
 func HoursBetween(a, b time.Time) float64 { return b.Sub(a).Hours() }
+func NextWorkday(t time.Time) time.Time {
+	for IsWeekend(t) {
+		t = t.AddDate(0, 0, 1)
+	}
+	return t
+}

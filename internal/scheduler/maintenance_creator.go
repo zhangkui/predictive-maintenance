@@ -25,3 +25,6 @@ func (m *MaintenanceCreator) Run(ctx context.Context) error {
 	return e
 }
 func (m *MaintenanceCreator) SetSkipWeekend(v bool) { m.SkipWeekend = v }
+func (m *MaintenanceCreator) ScheduledDate(now time.Time) time.Time {
+	return now
+}
