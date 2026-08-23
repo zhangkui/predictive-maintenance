@@ -9,9 +9,13 @@ import (
 	"time"
 )
 
-type DeviceService struct{ Repo *repository.DeviceRepository }
+type DeviceService struct {
+	Repo    *repository.DeviceRepository
+	Sensors *repository.SensorRepository
+}
 
-func NewDeviceService(r *repository.DeviceRepository) *DeviceService { return &DeviceService{r} }
+func NewDeviceService(r *repository.DeviceRepository) *DeviceService { return &DeviceService{Repo: r} }
+func (s *DeviceService) UseSensors(r *repository.SensorRepository)   { s.Sensors = r }
 func (s *DeviceService) Register(ctx context.Context, d model.Device) (model.Device, error) {
 	if strings.TrimSpace(d.Code) == "" || strings.TrimSpace(d.Name) == "" {
 		return d, fmt.Errorf("device code and name are required")
@@ -33,6 +37,20 @@ func (s *DeviceService) MarkOffline(ctx context.Context, timeout time.Duration) 
 		return e
 	}
 	deadline := time.Now().Add(-timeout)
+	if s.Sensors != nil {
+		for _, d := range devices {
+			latest, e := s.Sensors.LatestForDevice(ctx, d.ID)
+			if e != nil {
+				return e
+			}
+			if !latest.CreatedAt.IsZero() && latest.CreatedAt.Before(deadline) {
+				if e = s.SetStatus(ctx, d.ID, model.DeviceOffline); e != nil {
+					return e
+				}
+			}
+		}
+		return nil
+	}
 	for _, d := range devices {
 		if d.UpdatedAt.Before(deadline) {
 			if e = s.SetStatus(ctx, d.ID, model.DeviceOffline); e != nil {

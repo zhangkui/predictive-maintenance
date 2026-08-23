@@ -47,3 +47,13 @@ func (r *SensorRepository) History(ctx context.Context, device uint64, sensor st
 func (r *SensorRepository) Latest(ctx context.Context, device uint64) ([]model.SensorData, error) {
 	return r.History(ctx, device, "", time.Now().Add(-365*24*time.Hour), time.Now().Add(time.Minute), 1000)
 }
+func (r *SensorRepository) LatestForDevice(ctx context.Context, device uint64) (model.SensorData, error) {
+	items, e := r.Latest(ctx, device)
+	if e != nil {
+		return model.SensorData{}, e
+	}
+	if len(items) == 0 {
+		return model.SensorData{}, nil
+	}
+	return items[len(items)-1], nil
+}
