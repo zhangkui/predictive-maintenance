@@ -21,6 +21,7 @@ func TestBug010_BusinessRegression(t *testing.T) {
 		t.Fatal(e)
 	}
 	now := time.Now().UTC()
+	now = now.Add(-24 * time.Hour)
 	for i := 0; i < 20; i++ {
 		_, e = s.DB.Exec("INSERT INTO sensor_data(device_id,sensor_type,value,is_abnormal,abnormal_reason,collected_at,created_at) VALUES(?,?,?,?,?,?,?)", 1, "vibration", float64(i), false, "", now.Add(time.Duration(i)*time.Hour).Format(time.RFC3339), now.Format(time.RFC3339))
 		if e != nil {
