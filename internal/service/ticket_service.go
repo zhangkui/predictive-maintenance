@@ -18,6 +18,14 @@ func (s *TicketService) Create(ctx context.Context, a model.AbnormalRecord) (mod
 	}
 	now := time.Now().UTC()
 	title := "sensor abnormal: " + a.SensorType
+	var existing uint64
+	e := s.DB.QueryRowContext(ctx, "SELECT id FROM maintenance_tasks WHERE plan_id=0 AND device_id=? AND title=? AND status IN (?,?) ORDER BY id LIMIT 1", a.DeviceID, title, model.TaskPending, model.TaskRunning).Scan(&existing)
+	if e == nil {
+		return model.Ticket{ID: existing, DeviceID: a.DeviceID, AbnormalID: a.ID, Title: title, Priority: a.Severity, Status: model.TaskPending, Description: a.NormalRange, CreatedAt: now}, nil
+	}
+	if e != sql.ErrNoRows {
+		return model.Ticket{}, e
+	}
 	res, e := s.DB.ExecContext(ctx, "INSERT INTO maintenance_tasks(plan_id,device_id,title,description,priority,status,scheduled_date,created_at,updated_at)VALUES(0,?,?,?,?,?,?,?,?)", a.DeviceID, title, a.NormalRange, a.Severity, model.TaskPending, now.Format(time.RFC3339), now.Format(time.RFC3339), now.Format(time.RFC3339))
 	if e != nil {
 		return model.Ticket{}, e
